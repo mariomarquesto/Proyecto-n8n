@@ -1,0 +1,153 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "sendTo": "mariomarquesto@gmail.com",
+        "subject": "a ver si anda calendly",
+        "message": "=<div style=\"background-color: #fcfcfc; padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\">\n  <table align=\"center\" style=\"max-width: 600px; background-color: #ffffff; border-radius: 25px; border: 1px solid #fce4ec; overflow: hidden; box-shadow: 0 10px 30px rgba(214, 51, 132, 0.05);\">\n    \n    <tr>\n      <td style=\"background-color: #fff0f6; padding: 45px 20px; text-align: center;\">\n        <h1 style=\"color: #d63384; margin: 0; font-size: 32px; letter-spacing: 6px; text-transform: uppercase; font-weight: 300;\">GuaPaz</h1>\n        <p style=\"color: #a3818f; font-size: 14px; margin: 8px 0 0 0; font-style: italic; letter-spacing: 2px;\">Moda & Armonía</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td style=\"padding: 40px 40px 20px 40px; color: #444444; line-height: 1.8; font-size: 16px; white-space: pre-line; text-align: left;\">\n        {{ $json.text }}\n      </td>\n    </tr>\n\n    <tr>\n      <td style=\"padding: 0 40px 40px 40px; text-align: center;\">\n        <p style=\"color: #a3818f; font-size: 14px; margin-bottom: 20px;\">¿Te gustaría una asesoría personalizada?</p>\n        <a href=\"https://calendly.com/mariomarquesto/30min\" \n           style=\"background-color: #d63384; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(214, 51, 132, 0.3);\">\n           Agendar Cita en Boutique ✨\n        </a>\n      </td>\n    </tr>\n\n    <tr>\n      <td style=\"padding: 40px; text-align: center; background-color: #fafafa; border-top: 1px solid #f3f3f3;\">\n        <p style=\"font-weight: bold; color: #d63384; margin-bottom: 5px;\">Con cariño, el equipo de GuaPaz 🌸</p>\n        <p style=\"font-size: 12px; color: #999999; margin: 0;\">San Miguel de Tucumán, Argentina</p>\n      </td>\n    </tr>\n  </table>\n</div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -128
+      ],
+      "id": "e16fcd6b-01e7-489b-b062-f5f0734f9b36",
+      "name": "Send a message",
+      "webhookId": "3fdebe0a-9477-4aaf-bf1f-5abd90d29ef5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8hW0OUjdfcTmQNMr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "🌸 Experiencia GuaPaz",
+        "formDescription": "Queremos conocerte mejor para ofrecerte lo que más te gusta. ¡Bienvenida a casa!",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Apellido",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "=onReceived",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -352,
+        -144
+      ],
+      "id": "637ba43f-de8a-4524-80b4-f7e851afbc86",
+      "name": "On form submission",
+      "webhookId": "24737c25-5ca6-4448-9650-a84331307e96"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como la encargada de ventas de \"GuaPaz\", boutique de moda femenina en Tucumán. Redacta una bienvenida cálida y elegante.\n\nDATOS DE LA CLIENTA:\n- Apellido: {{ $json[\"Apellido\"] }}\n\nINSTRUCCIONES:\n1. Saluda: \"¡Hola, {{ $json[\"Apellido\"] }}! ✨\".\n2. Dale la bienvenida a nuestra comunidad de moda.\n3. El tono debe ser sofisticado pero cercano.\n4. Escribe solo el cuerpo del mensaje, sin introducciones.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "5635002d-9019-432b-beb6-e61122f5cb26",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        48
+      ],
+      "id": "c412bc13-4b8f-4406-b150-21475886818a",
+      "name": "Groq",
+      "credentials": {
+        "groqApi": {
+          "id": "7aHHEkXjr92TQWvZ",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "833ba66f-4795-4b90-8bd5-2cec49f49b65",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9df98b0b7bad9a786858b4669e86c041fa10b433b17c60faa6f218c34419ae2e"
+  },
+  "id": "E2kqhYcVrvqkmjWw",
+  "tags": [
+    {
+      "updatedAt": "2026-03-09T20:08:18.364Z",
+      "createdAt": "2026-03-09T20:08:18.364Z",
+      "id": "OL8BCulu6kJpWyJs",
+      "name": "PrimerAutomatizacion"
+    }
+  ]
+}
