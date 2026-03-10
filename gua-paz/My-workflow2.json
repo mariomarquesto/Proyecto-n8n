@@ -180,8 +180,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        560,
-        384
+        896,
+        256
       ],
       "id": "c2dee0c0-8896-4341-a1ec-9252f35b52ce",
       "name": "Groq ",
@@ -189,6 +189,86 @@
         "groqApi": {
           "id": "7aHHEkXjr92TQWvZ",
           "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1FAoYEJe_05J4tT71mj0FWIulmz59xj96PXKdGN_ryRQ",
+          "mode": "list",
+          "cachedResultName": "tablaDePrueba",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FAoYEJe_05J4tT71mj0FWIulmz59xj96PXKdGN_ryRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FAoYEJe_05J4tT71mj0FWIulmz59xj96PXKdGN_ryRQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json.Nombre }}",
+            "Email": "={{ $json.Email }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        384
+      ],
+      "id": "53f1c12d-6533-4cac-8b7a-fc328c6cef28",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2wBgBTOwcm56HNGl",
+          "name": "Google Sheets account"
         }
       }
     }
@@ -235,6 +315,11 @@
             "node": "Basic LLM Chain1",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -260,6 +345,11 @@
           }
         ]
       ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
     }
   },
   "active": false,
@@ -268,7 +358,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "b5cbb77e-64a0-41db-b4dc-7f78c5ab68ef",
+  "versionId": "5a790f1d-5e09-4b72-93c7-bfcd0efb007c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9df98b0b7bad9a786858b4669e86c041fa10b433b17c60faa6f218c34419ae2e"
