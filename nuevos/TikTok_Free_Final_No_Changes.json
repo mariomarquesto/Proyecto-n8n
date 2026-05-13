@@ -1,0 +1,463 @@
+{
+  "name": "TikTok_Free_Final_No_Changes",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Sos un experto en TikTok. Generá un consejo de EXACTAMENTE 3 palabras sobre emprendimiento o programación. Sin punto final. Al final, en una línea nueva, poné UNA palabra clave en inglés para el video de fondo.\"\n    },\n    {\n      \"role\": \"user\", \n      \"content\": \"Hoy es martes 12 de mayo de 2026. Generá contenido para mi agencia de ventas.\"\n    }\n  ],\n  \"temperature\": 0.7\n}",
+        "options": {}
+      },
+      "id": "9aa20891-d8ee-47c0-911b-9a5016713c57",
+      "name": "Groq_IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        -432
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0WfM4qQ8eHkBC5Xm",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a303e7e-9e42-41c7-834c-fa4e52ea9437",
+              "name": "contenido_video",
+              "value": "={{ $json.choices[0].message.content }} ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fce786af-406e-4216-a09b-550d8e962667",
+      "name": "Preparar Datos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -416
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 20
+            }
+          ]
+        }
+      },
+      "id": "3e4fdbb9-44a2-4509-88d0-4a3bcac6620a",
+      "name": "Cada 20 Minutos1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        -448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": " const contenido = $input.first().json.contenido_video\nconst lineas = contenido.split('\\n').filter(l => l.trim() !== '');\n\nreturn {\n  consejo: lineas[0].replace(/\\*\\*/g, '').trim(),\n  keyword: lineas[lineas.length - 1].replace(/\\*\\*/g, '').trim()\n};"
+      },
+      "id": "ad0ba206-794a-453f-88ec-757e7b118e74",
+      "name": "Separar Texto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit?gid=0#gid=0",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com(?:\\/.*|)\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Columna 1": "= {{ $json.consejo }}",
+            "Columna 2": "= {{ $json.keyword }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Columna 1",
+              "displayName": "Columna 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 2",
+              "displayName": "Columna 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 3",
+              "displayName": "Columna 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 4",
+              "displayName": "Columna 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 5",
+              "displayName": "Columna 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 6",
+              "displayName": "Columna 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "consejo",
+              "displayName": "consejo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6c3da996-ca29-4e79-952d-30815fe4809f",
+      "name": "Registrar en Excel1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        304,
+        -416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hMnwo1gNQcE2X9fi",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.creatomate.com/v2/renders/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -160,
+        -608
+      ],
+      "id": "a0ce21b4-1cc7-44f3-989e-3481a3b22ccc",
+      "name": "HTTP GET Request_Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7n749TVMcDIKMgIR",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.creatomate.com/v2/renders/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"fa9de4ac-8c87-4e54-bc2f-77d77ad21c94\",\n  \"modifications\": {\n    \"Text-1\": \"={{$json[\"Columna 1\"]}}\",\n    \"Text-1.fill_color\": \"#FFFFFF\",\n    \"Text-1.font_family\": \"Montserrat\",\n    \"Text-1.font_weight\": \"800\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -416,
+        -592
+      ],
+      "id": "c3ceb6cd-d70d-428c-8f7a-2f0533ec749f",
+      "name": "HTTP POST Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7n749TVMcDIKMgIR",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XhyBG1e71Ossws57H2GmHr0vCBTLMytqTi8_xobULr8/edit?gid=217458546#gid=217458546",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 217458546,
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XhyBG1e71Ossws57H2GmHr0vCBTLMytqTi8_xobULr8/edit#gid=217458546"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Columna 1": "={{ $json.status }}{{ $json.modifications['Text-1'] }}",
+            "Columna 2": "={{ $json.url }}"
+          },
+          "matchingColumns": [
+            "Columna 1"
+          ],
+          "schema": [
+            {
+              "id": "Columna 1",
+              "displayName": "Columna 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 2",
+              "displayName": "Columna 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 3",
+              "displayName": "Columna 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 4",
+              "displayName": "Columna 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 5",
+              "displayName": "Columna 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 6",
+              "displayName": "Columna 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        -640
+      ],
+      "id": "bcd2e807-b690-41e2-a947-e3b05e301368",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hMnwo1gNQcE2X9fi",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq_IA": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cada 20 Minutos1": {
+      "main": [
+        [
+          {
+            "node": "Groq_IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Texto": {
+      "main": [
+        [
+          {
+            "node": "Registrar en Excel1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos": {
+      "main": [
+        [
+          {
+            "node": "Separar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar en Excel1": {
+      "main": [
+        [
+          {
+            "node": "HTTP POST Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP POST Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP GET Request_Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP GET Request_Video": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "919e84b3-7918-44fa-9d93-f398b62c58c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "150878741c77bb0a50f511e4489e9c599c7c9da969fe5307feb9b26066521653"
+  },
+  "id": "tMweA0NaxhcOENTA",
+  "tags": []
+}

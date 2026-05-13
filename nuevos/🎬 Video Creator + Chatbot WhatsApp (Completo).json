@@ -1,0 +1,604 @@
+{
+  "name": "🎬 Video Creator + Chatbot WhatsApp (Completo)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "a18ba79a-9a0f-467a-ac6b-0c3082ce6eb4",
+      "name": "⏰ Trigger cada 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        256
+      ],
+      "webhookId": "schedule-video-creator"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit?gid=42862459#gid=42862459",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 42862459,
+          "mode": "list",
+          "cachedResultName": "Hoja 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit#gid=42862459"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "E (Estado)",
+              "lookupValue": "Pendiente"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "88709564-d0dc-4b25-ba74-5bfec6dea548",
+      "name": "📊 Google Sheets - Leer pendientes",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -1376,
+        256
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hMnwo1gNQcE2X9fi",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraer datos de la fila\nconst item = $input.first().json;\nconst consejo = item[\"A (Consejo)\"] || \"Aprende algo nuevo\";\nconst rowNumber = item.row_number;\nconst telefono = item[\"B (Telefono)\"] || \"\";\nconst estado = item[\"E (Estado)\"] || \"\";\n\nreturn [{\n  json: {\n    consejo: consejo,\n    rowNumber: rowNumber,\n    telefono: telefono,\n    estado: estado,\n    status: \"pending\"\n  }\n}];"
+      },
+      "id": "6c99f36e-f803-469f-aa61-60c7ad456ba1",
+      "name": "✂️ Extraer datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.creatomate.com/v2/renders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_id",
+              "value": "fa9de4ac-8c87-4e54-bc2f-77d77ad21c94"
+            },
+            {
+              "name": "modifications",
+              "value": "={{ { \"Text-1\": $json.consejo, \"Text-1.fill_color\": \"#FFFFFF\", \"Text-1.font_family\": \"Montserrat\", \"Video.source\": \"https://creatomate.com/files/assets/7347c3b7-e1a8-4439-96f1-f3dfc95c3d28\" } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f3fade49-5388-4a31-9a3c-5afdecc91e37",
+      "name": "🎬 Creatomate - Crear video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -976,
+        256
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Kt1eM463WtC5LmHM",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const renderId = $input.first().json.id;\nconst consejo = $node[\"✂️ Extraer datos\"].json.consejo;\nconst rowNumber = $node[\"✂️ Extraer datos\"].json.rowNumber;\nconst telefono = $node[\"✂️ Extraer datos\"].json.telefono;\n\nreturn [{\n  json: {\n    renderId: renderId,\n    consejo: consejo,\n    rowNumber: rowNumber,\n    telefono: telefono,\n    attempts: 0\n  }\n}];"
+      },
+      "id": "9928e18c-d68d-4d67-8174-3796def32146",
+      "name": "💾 Guardar ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        256
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "849e1507-4e95-46b6-8624-77fa271a804f",
+      "name": "⏳ Esperar 5 seg",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -608,
+        -96
+      ],
+      "webhookId": "83607052-a8d8-4318-a7bb-3ee118d73201"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.creatomate.com/v2/renders/{{$json.renderId}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "587ff3a9-9e4e-46a6-a467-570ff163bf92",
+      "name": "🔍 Verificar estado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        256
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "YSUKiqtWsk6XNMNj",
+          "name": "Bearer Auth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "succeeded"
+            }
+          ]
+        }
+      },
+      "id": "956283ae-2413-4cac-88be-96967ef9131d",
+      "name": "✅ ¿Video listo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verificar si el video está listo\nconst status = $input.first().json.status;\nconst videoUrl = $input.first().json.url;\nconst snapshotUrl = $input.first().json.snapshot_url;\nconst renderId = $input.first().json.id;\n\n// Si está succeeded, pasamos los datos\nif (status === \"succeeded\") {\n  return [{\n    json: {\n      renderId: renderId,\n      videoUrl: videoUrl,\n      snapshotUrl: snapshotUrl,\n      status: \"succeeded\"\n    }\n  }];\n} \n// Si está rendering, reintentamos\nelse if (status === \"rendering\") {\n  // Lanzamos un error controlado para que n8n reintente\n  throw new Error(`Video aún en proceso (rendering). Reintentando...`);\n}\n// Si falló o cualquier otro estado\nelse {\n  return [{\n    json: {\n      renderId: renderId,\n      status: \"failed\",\n      error: `Estado inesperado: ${status}`\n    }\n  }];\n}"
+      },
+      "id": "7f069221-72f9-4867-81d5-66a68c5dab02",
+      "name": "📦 Actualizar datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $node[\"💾 Guardar ID\"].json;\nconst attempts = (prev.attempts || 0) + 1;\n\nif (attempts < 15) {\n  return [{\n    json: {\n      renderId: prev.renderId,\n      consejo: prev.consejo,\n      rowNumber: prev.rowNumber,\n      telefono: prev.telefono,\n      attempts: attempts\n    }\n  }];\n} else {\n  return [{\n    json: {\n      renderId: prev.renderId,\n      consejo: prev.consejo,\n      rowNumber: prev.rowNumber,\n      telefono: prev.telefono,\n      status: \"failed\",\n      error: \"Timeout\"\n    }\n  }];\n}"
+      },
+      "id": "0aa40fb6-93be-4d55-aa79-dbb45490a44b",
+      "name": "🔄 Reintentar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit?gid=42862459#gid=42862459",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 42862459,
+          "mode": "list",
+          "cachedResultName": "Hoja 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw/edit#gid=42862459"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "E (Estado)": "={{ $json.status }}",
+            "C (VideoURL)": "={{ $json.videoUrl }}",
+            "D (SnapshotURL)": "={{ $json.snapshotUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "A (Consejo)",
+              "displayName": "A (Consejo)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "B (Telefono)",
+              "displayName": "B (Telefono)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "C (VideoURL)",
+              "displayName": "C (VideoURL)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "D (SnapshotURL)",
+              "displayName": "D (SnapshotURL)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "E (Estado)",
+              "displayName": "E (Estado)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "72dc5776-da4d-4794-a7f6-d03cf9caaa33",
+      "name": "📝 Google Sheets - Guardar video",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        240,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hMnwo1gNQcE2X9fi",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "value": "10C671i8gXgahHDSHzD02H1i-TcbZiqGMeOPEX2AUyjw"
+        },
+        "sheetName": "hoja2",
+        "options": {}
+      },
+      "id": "20efde5c-aca4-4288-9137-a00cc36f893f",
+      "name": "📝 Google Sheets - Marcar error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        240,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hMnwo1gNQcE2X9fi",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAlaOYu0Z3ou9j2ZYQtg2yVIN3jHH8t-jg",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents[0].parts[0].text",
+              "value": "={{ $json.mensaje }}"
+            },
+            {
+              "name": "systemInstruction.parts[0].text",
+              "value": "Sos un asistente experto en ventas y marketing. Respondé en español, breve y útil."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc376cb4-036c-4529-811c-e83dc1ccc3ee",
+      "name": "🤖 Gemini IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1168,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "options": {}
+      },
+      "id": "728ed903-411c-4bee-b1f7-b66481bbedfd",
+      "name": "📱 Webhook WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        544
+      ],
+      "webhookId": "3e58ddfa-c677-44e1-878d-9923da947358"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\nconst from = $input.first().json.from;\nconst message = $input.first().json.message || body;\n\nreturn [{\n  json: {\n    chatId: from,\n    mensaje: message,\n    session: 'default'\n  }\n}];"
+      },
+      "id": "acd99d5f-cc47-46c4-8d77-9a8d84df28be",
+      "name": "✂️ Procesar mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst reply = response.candidates?.[0]?.content?.parts?.[0]?.text || \"Lo siento, no pude procesar tu mensaje. ¿Podés repetirlo?\";\n\nreturn [{\n  json: {\n    respuesta: reply,\n    chatId: $node[\"✂️ Procesar mensaje\"].json.chatId\n  }\n}];"
+      },
+      "id": "9c0057df-8c32-4587-abd6-dbaa44d0d4dd",
+      "name": "📦 Extraer respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "my-secret-key"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "default"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.respuesta }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "81a99bfd-5ba0-42c5-a648-6d242db97261",
+      "name": "💬 WhatsApp - Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        544
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "⏰ Trigger cada 15 min": {
+      "main": [
+        [
+          {
+            "node": "📊 Google Sheets - Leer pendientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Google Sheets - Leer pendientes": {
+      "main": [
+        [
+          {
+            "node": "✂️ Extraer datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✂️ Extraer datos": {
+      "main": [
+        [
+          {
+            "node": "🎬 Creatomate - Crear video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎬 Creatomate - Crear video": {
+      "main": [
+        [
+          {
+            "node": "💾 Guardar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Guardar ID": {
+      "main": [
+        [
+          {
+            "node": "🔍 Verificar estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏳ Esperar 5 seg": {
+      "main": [
+        []
+      ]
+    },
+    "🔍 Verificar estado": {
+      "main": [
+        [
+          {
+            "node": "📦 Actualizar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ ¿Video listo?": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "📦 Actualizar datos": {
+      "main": [
+        [
+          {
+            "node": "📝 Google Sheets - Guardar video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔄 Reintentar": {
+      "main": [
+        []
+      ]
+    },
+    "📱 Webhook WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "✂️ Procesar mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✂️ Procesar mensaje": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini IA": {
+      "main": [
+        [
+          {
+            "node": "📦 Extraer respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📦 Extraer respuesta": {
+      "main": [
+        [
+          {
+            "node": "💬 WhatsApp - Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f5cba857-1116-46a7-b17b-b82374cff8f2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "150878741c77bb0a50f511e4489e9c599c7c9da969fe5307feb9b26066521653"
+  },
+  "id": "czo5RvM6zyOnWIpp",
+  "tags": []
+}
